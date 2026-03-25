@@ -1,0 +1,114 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* App container */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  position: relative;
+  z-index: 0;
+}
+
+/* Transparent background image using pseudo-element */
+.app-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("./image/bg.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.4; /* make the background image transparent */
+  z-index: -1; /* behind the content */
+}
+.app-grid {
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* header | content | footer */
+  height: 100vh; /* 🔒 lock screen height */
+}
+
+/* Card */
+.form-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.95); /* slightly transparent card */
+  padding: 30px;
+  width: 350px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Titles */
+.title {
+  font-size: 24px;
+  color: #14532d;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* Inputs */
+form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Button */
+form button {
+  width: 100%;
+  padding: 10px;
+  background-color: #15803d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: #166534;
+}
+
+/* Switch text */
+.switch-text {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #15803d;
+  cursor: pointer;
+}
+
+.switch-text:hover {
+  text-decoration: underline;
+}
+
+/* Home Page */
+.home-container {
+  min-height: 100vh;
+  background-color: #ecfdf5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+.home-container h1 {
+  font-size: 32px;
+  color: #14532d;
+}
+

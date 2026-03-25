@@ -1,0 +1,14 @@
+.market-header {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 10px;
+}
+
+.sell, .buy {
+  background: #ecfdf5;
+  color: #14532d;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+}
