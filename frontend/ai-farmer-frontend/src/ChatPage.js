@@ -32,8 +32,51 @@ const ChatPage = () => {
     { sender: "bot", text: getWelcomeMessage("English") }
   ]);
 
-  const recognitionRef = useRef(null);
+  // =========================
+  // 🔥 CAMERA FIX (NEW)
+  // =========================
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+  const [showCameraOptions, setShowCameraOptions] = useState(false);
+  const handleImage = async (file) => {
+    if (!file) return;
 
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("message", "");
+
+    try {
+      const res = await fetch("http://localhost:5001/chat", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      setMessages((prev) => [
+        ...prev,
+        { sender: "user", text: "📷 Image sent" },
+        { sender: "bot", text: data.reply }
+      ]);
+    } catch (err) {
+      console.error(err);
+      alert("Image upload failed");
+    }
+  };
+
+  const openCameraOptions = () => {
+    setShowCameraOptions((prev) => !prev);
+  };
+
+  const openUpload = () => {
+    fileInputRef.current.click();
+    setShowCameraOptions(false);
+  };
+
+  const openCamera = () => {
+    cameraInputRef.current.click();
+    setShowCameraOptions(false);
+  };
   // =========================
   // 🛒 FETCH MARKET
   // =========================
@@ -81,7 +124,7 @@ const ChatPage = () => {
 
       if (res.ok) {
         alert("✅ Item purchased successfully!");
-        fetchMarket(); // refresh list
+        fetchMarket();
       } else {
         alert("❌ Failed to purchase item");
       }
@@ -91,6 +134,7 @@ const ChatPage = () => {
       alert("❌ Server error while buying");
     }
   };
+
   // 🎙️ MIC
   const startListening = () => {
     const SpeechRecognition =
@@ -114,7 +158,11 @@ const ChatPage = () => {
     speech.lang = language === "Tamil" ? "ta-IN" : "en-IN";
     window.speechSynthesis.speak(speech);
   };
-
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
   // 💬 SEND MESSAGE
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -142,7 +190,7 @@ const ChatPage = () => {
 
   return (
     <div className="app-wrapper">
-      {/* LANGUAGE */}
+
       <div className="language-select-box">
         <select onChange={(e) => setLanguage(e.target.value)}>
           <option>English</option>
@@ -163,13 +211,12 @@ const ChatPage = () => {
         <main className="main">
           <div className="chat-box">
 
-            {/* HEADER */}
             <div className="chat-header">
               <img src={farmImg} alt="" className="chat-header-img" />
               <span>Farm AI</span>
             </div>
 
-            {/* 🛒 BUTTON */}
+            {/* MARKET */}
             <button
               className="market-toggle-btn"
               onClick={() => {
@@ -180,7 +227,6 @@ const ChatPage = () => {
               🛒 Marketplace
             </button>
 
-            {/* 🛒 MARKET UI */}
             {showMarket && (
               <div className="market-box">
                 <h3>Sell Crop</h3>
@@ -203,10 +249,7 @@ const ChatPage = () => {
                       <div>👤 {item.seller}</div>
                     </div>
 
-                    <button
-                      className="buy-btn"
-                      onClick={() => handleBuy(item)}
-                    >
+                    <button className="buy-btn" onClick={() => handleBuy(item)}>
                       Buy
                     </button>
                   </div>
@@ -234,9 +277,58 @@ const ChatPage = () => {
 
             {/* INPUT */}
             <div className="chat-input">
-              <button className="ui-icon">
-                <img src={cameraIcon} alt="" />
-              </button>
+
+              {/* CAMERA BUTTON FIXED */}
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <button className="ui-icon" onClick={openCameraOptions}>
+                  <img src={cameraIcon} alt="" />
+                </button>
+
+                {showCameraOptions && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "45px",
+                      left: "0",
+                      background: "#ffffff",
+                      padding: "6px",
+                      borderRadius: "10px",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                      zIndex: 999,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "6px",
+                      minWidth: "120px"
+                    }}
+                  >
+                    <button
+                      onClick={openUpload}
+                      style={{
+                        padding: "6px",
+                        border: "none",
+                        background: "#f2f2f2",
+                        borderRadius: "6px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      📁 Upload
+                    </button>
+
+                    <button
+                      onClick={openCamera}
+                      style={{
+                        padding: "6px",
+                        border: "none",
+                        background: "#f2f2f2",
+                        borderRadius: "6px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      📸 Camera
+                    </button>
+                  </div>
+                )}
+              </div>
 
               <button className="ui-icon" onClick={startListening}>
                 <img src={micIcon} alt="" />
@@ -245,6 +337,7 @@ const ChatPage = () => {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyPress}
               />
 
               <button className="send-btn" onClick={sendMessage}>
@@ -252,10 +345,28 @@ const ChatPage = () => {
               </button>
             </div>
 
+            {/* Hidden Inputs */}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={(e) => handleImage(e.target.files[0])}
+            />
+
+            <input
+              type="file"
+              accept="image/*"
+              capture
+              ref={cameraInputRef}
+              style={{ display: "none" }}
+              onChange={(e) => handleImage(e.target.files[0])}
+            />
+
           </div>
         </main>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

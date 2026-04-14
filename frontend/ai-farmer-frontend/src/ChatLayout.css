@@ -328,59 +328,64 @@
   transform: scale(0.95);
 }
 
-.market-card {
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 14px;
+.market-price-card {
   background: #ffffff;
-  border: 1px solid #bbf7d0;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 15px;
+
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  max-height: 320px;
+  overflow-y: auto;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.market-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #14532d;
-  margin-bottom: 10px;
+.market-price-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
-.market-loading {
-  font-size: 14px;
-  color: #555;
-  padding: 8px 0;
-}
-
-.market-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.market-row {
-  padding: 10px;
-  border-radius: 12px;
-  background: #ecfdf5;
-  border: 1px solid #dcfce7;
-}
-
-.market-commodity {
-  font-size: 16px;
-  font-weight: 700;
-  color: #14532d;
-}
-
-.market-meta {
-  font-size: 13px;
-  color: #444;
-  margin-top: 2px;
-}
-
-.market-prices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 8px;
-  font-size: 13px;
-  color: #166534;
+/* Title */
+.market-price-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 15px;
   font-weight: 600;
+  color: #1b5e20;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Content text */
+.market-price-card pre {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #2e2e2e;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  background: #f8fdf9;
+  padding: 10px;
+  border-radius: 10px;
+  border-left: 4px solid #43a047;
+}
+
+/* Scrollbar */
+.market-price-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.market-price-card::-webkit-scrollbar-thumb {
+  background: #c8e6c9;
+  border-radius: 10px;
+}
+
+.market-price-card::-webkit-scrollbar-thumb:hover {
+  background: #81c784;
 }
