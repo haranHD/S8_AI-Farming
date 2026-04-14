@@ -12,6 +12,8 @@ from tensorflow.keras.applications.mobilenet_v2 import (
     decode_predictions
 )
 from pymongo import MongoClient
+import bcrypt
+from bson import ObjectId
 
 # =========================
 # MONGODB
@@ -19,6 +21,7 @@ from pymongo import MongoClient
 client = MongoClient("mongodb://localhost:27017/")
 db = client["farming_chatbot"]
 market_collection = db["marketplace"]
+users_collection = db["users"]
 
 # =========================
 # MODEL
@@ -34,6 +37,88 @@ CORS(app)
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
+
+# =========================
+# REGISTER
+# =========================
+@app.route("/register", methods=["POST"])
+def register():
+    try:
+        data = request.get_json()
+
+        name = data.get("name")
+        phone = data.get("phone")
+        password = data.get("password")
+
+        # validation
+        if not name or not phone or not password:
+            return jsonify({"message": "Missing fields"}), 400
+
+        # check if user exists
+        if users_collection.find_one({"phone": phone}):
+            return jsonify({"message": "User already exists"}), 400
+
+        # hash password
+        hashed_pw = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+
+        users_collection.insert_one({
+            "name": name,
+            "phone": phone,
+            "password": hashed_pw
+        })
+
+        return jsonify({"message": "Registration successful"}), 201
+
+    except Exception as e:
+        print("REGISTER ERROR:", e)
+        return jsonify({"error": "Register failed"}), 500
+
+
+# =========================
+# LOGIN (USERNAME BASED)
+# =========================
+@app.route("/login", methods=["POST"])
+def login():
+    try:
+        data = request.get_json()
+
+        name = data.get("name")
+        password = data.get("password")
+
+        # validation
+        if not name or not password:
+            return jsonify({"message": "Missing fields"}), 400
+
+        user = users_collection.find_one({"name": name})
+
+        if not user:
+            return jsonify({"message": "User not found"}), 404
+
+        stored_password = user["password"]
+
+        # safe bcrypt handling
+        if isinstance(stored_password, str):
+            stored_password = stored_password.encode("utf-8")
+        elif isinstance(stored_password, bytes):
+            pass
+        else:
+            stored_password = bytes(stored_password)
+
+        if bcrypt.checkpw(password.encode("utf-8"), stored_password):
+            return jsonify({
+                "message": "Login successful",
+                "user": {
+                    "name": user["name"],
+                    "phone": user["phone"]
+                }
+            }), 200
+
+        return jsonify({"message": "Invalid password"}), 401
+
+    except Exception as e:
+        print("LOGIN ERROR:", e)
+        return jsonify({"error": "Login failed"}), 500
+
 
 # =========================
 # WEATHER API
@@ -60,7 +145,44 @@ def get_weather():
         print("WEATHER ERROR:", e)
         return jsonify({"error": "Weather failed"}), 500
 
+#========================
+# MARKET PRICES (AI GENERATED)
+#========================
+@app.route("/market-prices", methods=["GET"])
+def market_prices():
+    try:
+        prompt = """
+        Give today's daily crop market prices in India.
+        Format:
+        crop name - price per kg (INR)
+        Only 8 major crops.
+        """
 
+        url = "https://api.groq.com/openai/v1/chat/completions"
+
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "model": "llama-3.1-8b-instant",
+            "messages": [
+                {"role": "system", "content": "You are an agriculture market analyst"},
+                {"role": "user", "content": prompt}
+            ]
+        }
+
+        res = requests.post(url, headers=headers, json=payload)
+        data = res.json()
+
+        reply = data["choices"][0]["message"]["content"]
+
+        return jsonify({"prices": reply})
+
+    except Exception as e:
+        print("MARKET PRICE ERROR:", e)
+        return jsonify({"error": "Failed to fetch prices"}), 500
 # =========================
 # SELL
 # =========================
@@ -106,10 +228,8 @@ def buy_crops():
         return jsonify({"error": "Fetch failed"}), 500
 
 
-from bson import ObjectId   # ✅ ADD THIS
-
 # =========================
-# 🛒 BUY ITEM (DELETE)
+# BUY ITEM (DELETE)
 # =========================
 @app.route("/buy/<item_id>", methods=["DELETE"])
 def buy_item(item_id):
@@ -124,6 +244,7 @@ def buy_item(item_id):
     except Exception as e:
         print("BUY ERROR:", e)
         return jsonify({"error": "Failed to buy item"}), 500
+
 
 # =========================
 # CHAT + IMAGE
@@ -158,10 +279,7 @@ def chat():
             if disease == "not_plant":
                 return jsonify({"reply": "Not a plant ❌"})
 
-            prompt = f"""
-            Detected: {disease}
-            Explain simply for farmers.
-            """
+            prompt = f"Detected: {disease}. Explain simply for farmers."
 
             url = "https://api.groq.com/openai/v1/chat/completions"
 
