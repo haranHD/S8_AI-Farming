@@ -116,6 +116,12 @@
   z-index: 0;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil&display=swap');
+
+body {
+  font-family: 'Noto Sans Tamil', sans-serif;
+}
+
 /* =======================
    MESSAGE BUBBLES
 ======================= */
@@ -127,6 +133,8 @@
   font-size: 18px;
   line-height: 1.4;
   border-radius: 14px;
+  font-family: 'Noto Sans Tamil', sans-serif;
+
 }
 
 /* BOT MESSAGE */

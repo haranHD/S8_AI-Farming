@@ -153,14 +153,44 @@ const ChatPage = () => {
   };
 
   // 🔊 SPEAK
-  const speakText = (text) => {
-    const speech = new SpeechSynthesisUtterance(text);
-    speech.lang = language === "Tamil" ? "ta-IN" : "en-IN";
-    window.speechSynthesis.speak(speech);
-  };
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      sendMessage();
+  const speakText = async (text) => {
+
+    // ✅ ENGLISH → use browser (FAST)
+    if (language === "English") {
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.lang = "en-IN";
+      speech.rate = 1;
+      speech.pitch = 1;
+
+      window.speechSynthesis.speak(speech);
+      return;
+    }
+
+    // ✅ TAMIL → use backend (gTTS)
+    try {
+      const res = await fetch("http://localhost:5001/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: text,
+          language: "Tamil",
+          speak: true
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.audio) {
+        const audio = new Audio(`data:audio/mp3;base64,${data.audio}`);
+        audio.play();
+      } else {
+        alert("Speech not available");
+      }
+
+    } catch (err) {
+      console.error("TTS Error:", err);
     }
   };
   // 💬 SEND MESSAGE
@@ -175,7 +205,10 @@ const ChatPage = () => {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ message: input })
+      body: JSON.stringify({
+        message: input,
+        language: language   // ✅ VERY IMPORTANT
+      })
     });
 
     const data = await res.json();
@@ -192,9 +225,9 @@ const ChatPage = () => {
     <div className="app-wrapper">
 
       <div className="language-select-box">
-        <select onChange={(e) => setLanguage(e.target.value)}>
-          <option>English</option>
-          <option>Tamil</option>
+        <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+          <option value="English">English</option>
+          <option value="Tamil">Tamil</option>
         </select>
       </div>
 
@@ -337,7 +370,7 @@ const ChatPage = () => {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyPress}
+              // onKeyDown={(e) => { }
               />
 
               <button className="send-btn" onClick={sendMessage}>

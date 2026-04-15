@@ -8,6 +8,7 @@
   cursor: pointer;
 }
 
+
 .market-box {
   background: #f0fdf4;
   padding: 10px;
@@ -60,4 +61,63 @@
   color: white;
   padding: 10px 16px;
   border-radius: 8px;
+}
+
+/* 🌾 Market Card Container */
+.market-prices-card {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  margin-top: 15px;
+}
+
+/* Title */
+.market-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #2e7d32;
+}
+
+/* Loading text */
+.loading-text {
+  font-size: 14px;
+  color: #777;
+}
+
+/* Grid layout */
+.price-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Each item card */
+.price-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f1f8e9, #e8f5e9);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover effect 🔥 */
+.price-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Crop name */
+.crop {
+  font-weight: 500;
+  color: #2e7d32;
+}
+
+/* Price */
+.price {
+  font-weight: bold;
+  color: #1b5e20;
 }

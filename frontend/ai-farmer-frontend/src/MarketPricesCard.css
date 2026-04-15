@@ -1,0 +1,70 @@
+.market-prices-card {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.market-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #2e7d32;
+}
+
+.loading-text {
+    font-size: 14px;
+    color: #777;
+}
+
+.price-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.price-card {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f1f8e9, #e8f5e9);
+    transition: 0.2s ease;
+}
+
+.price-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.crop {
+    font-weight: 500;
+    color: #2e7d32;
+}
+
+.price {
+    font-weight: bold;
+    color: #1b5e20;
+}
+
+/* 🔥 SCROLL CONTAINER */
+.scroll-box {
+    max-height: 220px;
+    /* height of box */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* 🌿 Smooth scrollbar */
+.scroll-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scroll-box::-webkit-scrollbar-thumb {
+    background: #4caf50;
+    border-radius: 10px;
+}
+
+.scroll-box::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
